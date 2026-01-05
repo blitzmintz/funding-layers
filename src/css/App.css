@@ -1,0 +1,31 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  color: #213547;
+}
+
+.card {
+  text-align: center;
+  place-items: center;
+  color: #213546;
+}
+
+.layer {
+  padding: 2em;
+  text-align: left;
+}
+
+.layer-box {
+  display: flex;
+  gap: 20px;
+}
+
+.add-buttons {
+  min-width: max-content;
+  display: grid;
+  padding: 1em;
+  gap: 10px;
+}
+
