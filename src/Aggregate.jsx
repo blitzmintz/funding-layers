@@ -11,7 +11,7 @@ export default function Aggregate({ layerName, balance }) {
     const fieldId = layerName.toString().length;
 
     return (
-        <Box sx={{display: 'flex', alignItems: 'center', mb: 2, mr: 20, gap:5}} className="layer-box">
+        <Box sx={{mb: 2}} className="layer-box">
             <FormLabel sx={{minWidth: 120, color: 'text.primary', textAlign: 'right'}}>
                 {layerName}
             </FormLabel>
@@ -21,6 +21,7 @@ export default function Aggregate({ layerName, balance }) {
                 value={inputValue}
                 onChange={handleChange}
                 color={"secondary"}
+                type="number"
             />
             <TextField disabled
                        value={balance ?? 0}

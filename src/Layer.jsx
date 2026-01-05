@@ -1,5 +1,5 @@
 import './css/App.css'
-import {Box, Button, FormLabel, OutlinedInput, TextField} from '@mui/material';
+import {Box, FormLabel, TextField} from '@mui/material';
 import {useState} from "react";
 
 
@@ -16,12 +16,13 @@ export default function Layer({ layerName, balance }) {
     const fieldId = layerName.toString().length;
 
     return (
-        <Box sx={{display: 'flex', alignItems: 'center', mb: 2, mr: 20, gap:5}} className="layer-box">
-            <FormLabel sx={{minWidth: 120, color: 'text.primary', textAlign: 'right'}}>
+        <Box sx={{mb: 2}} className="layer-box">
+            <FormLabel sx={{ color: 'text.primary'}} className="mobile-layer-name">
                 {layerName}
             </FormLabel>
             <TextField
                 id={layerName}
+                type="number"
                 label={hasLimit(layerName) ? "Enter limit" : "Limit not applicable"}
                 value={inputValue}
                 onChange={handleChange}
