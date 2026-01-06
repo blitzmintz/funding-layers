@@ -18,10 +18,9 @@ export default function Aggregate({ layerName, balance }) {
             <TextField
                 id={layerName}
                 label="Aggregate Stop Loss"
-                value={inputValue}
+                value={inputValue ?? null}
                 onChange={handleChange}
                 color={"secondary"}
-                type="number"
             />
             <TextField disabled
                        value={balance ?? 0}

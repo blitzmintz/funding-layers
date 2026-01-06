@@ -11,9 +11,22 @@ export default function calculateLayers(amount) {
     let gap;
 
     amount = parseFloat(amount);
+    console.log(aggregateStopLoss)
 
     function isAggregateBreached() {
-        return (aggregateBalance >= aggregateStopLoss)
+        if (isNaN(aggregateStopLoss) || aggregateStopLoss === 0) {
+            return false;
+        } else {
+            return (aggregateBalance >= aggregateStopLoss);
+        }
+    }
+
+    function applyToAggregate(amount) {
+        if (isNaN(aggregateStopLoss)|| aggregateStopLoss === 0) { /* empty */ }
+        else {
+            aggregateBalance = aggregateBalance + amount;
+        }
+
     }
 
     function applyToInsurer(amount) {
@@ -31,13 +44,14 @@ export default function calculateLayers(amount) {
         if (excessLimit > 0 && excessLimit !== excessBalance) {
             if (excessLimit - excessBalance >= amount) {
                 excessBalance = excessBalance + amount;
-                aggregateBalance = aggregateBalance + amount;
+                applyToAggregate(amount);
                 amount = 0;
             } else if (amount > 0 && excessLimit >= excessBalance) {
                 gap = excessLimit - excessBalance;
                 amount = amount - gap;
                 excessBalance = excessLimit;
                 aggregateBalance = aggregateBalance + gap;
+                applyToAggregate(gap);
             }
         }
 
@@ -47,14 +61,14 @@ export default function calculateLayers(amount) {
         } else if (sirLimit > 0 && sirLimit !== sirBalance && amount > 0) {
             if (sirLimit - sirBalance >= amount) {
                 sirBalance = sirBalance + amount;
-                aggregateBalance = aggregateBalance + amount;
+                applyToAggregate(amount);
                 amount = 0
 
             } else if (amount > 0 && sirLimit >= sirBalance) {
                 gap = sirLimit - sirBalance;
                 amount = amount - gap;
                 sirBalance = sirLimit;
-                aggregateBalance = aggregateBalance + gap;
+                applyToAggregate(gap);
             }
         }
         //apply remainder to insurer
