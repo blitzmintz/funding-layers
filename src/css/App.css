@@ -33,6 +33,10 @@
   gap: 10px;
 }
 
+.help-box {
+  margin: 5px;
+}
+
 @media (max-width: 450px) {
   .card {
     display: flex;

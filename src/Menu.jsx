@@ -5,6 +5,7 @@ import {Box, Button, FormLabel, OutlinedInput} from "@mui/material";
 import calculateLayers from "./calculators/payments.js";
 import distributeRecoveries from "./calculators/recoveries.js";
 import Aggregate from "./Aggregate.jsx";
+import HelpPopover from "./HelpPopover.jsx";
 
 export default function MenuBar(){
     const [balances, setBalances] = useState({
@@ -13,6 +14,8 @@ export default function MenuBar(){
         ins: 0,
         agg: 0
     });
+
+
 
 
     const [transactionAmount, setTransactionAmount] = useState(0);
@@ -56,7 +59,10 @@ export default function MenuBar(){
     return (
         <>
             <div className="card">
+                <HelpPopover />
                 <h4>funding layers</h4>
+
+
                 <div>
                     <Layer layerName="Excess" balance={balances.excess}/>
                     <Layer layerName="SIR" balance={balances.sir}/>
