@@ -1,122 +1,109 @@
 import './css/App.css'
 import Layer from './Layer.jsx'
 import {useState} from "react";
-import {Box, Button, FormLabel, OutlinedInput} from "@mui/material";
-import calculateLayers from "./calculators/payments.js";
-import distributeRecoveries from "./calculators/recoveries.js";
-import Aggregate from "./Aggregate.jsx";
 import HelpPopover from "./HelpPopover.jsx";
+import AddAmount from "./AddAmount.jsx";
 
-export default function MenuBar(){
+//this component needs to track:
+//layer limits
+//layer balances (totals)
+//aggregate stop loss
+//aggregate balance
+//ranking statuses
+
+export default function Menu(){
+    const LAYERS = [
+        { key: 'excess', label: 'Excess' },
+        { key: 'sir', label: 'SIR' },
+        { key: 'ins', label: 'Insurer' },
+        { key: 'agg', label: 'Aggregate' }
+    ];
     const [balances, setBalances] = useState({
         excess: 0,
         sir: 0,
         ins: 0,
         agg: 0
     });
+    const [limits, setLimits] = useState({
+        excess: null,
+        sir: null,
+        ins: null,
+        agg: null
+    });
 
+    const [isRanking, setIsRanking] = useState({
+        excess: true,
+        sir: true,
+        ins: null,
+        agg: null
+    });
 
+    const handleAddAmount = (amount) => {
+        let remaining = amount;
 
+        setBalances(prev => {
+            const nextBal = { ...prev };
 
-    const [transactionAmount, setTransactionAmount] = useState(0);
-    const transactionAmountChange = (event) => {
-        const value = event.target.value;
-        setTransactionAmount(value === '' ? 0 : Number(value));
+            const aggBreached =
+                limits.agg !== null && nextBal.agg >= limits.agg;
 
+            const applyToLayer = (key) => {
+                if (remaining <= 0) return;
+                if (limits[key] === null) return;
+
+                const capacity = limits[key] - nextBal[key];
+                if (capacity <= 0) return;
+
+                const applied = Math.min(capacity, remaining);
+                nextBal[key] += applied;
+
+                if (isRanking[key]) {
+                    nextBal.agg += applied;
+                }
+
+                remaining -= applied;
+            };
+
+            if (!aggBreached) {
+                applyToLayer('excess');
+                applyToLayer('sir');
+            }
+
+            if (remaining > 0) {
+                nextBal.ins += remaining;
+            }
+
+            return nextBal;
+        });
     };
-
-    const [recoveryAmount, setRecoveryAmount] = useState(0);
-    const recoveryAmountChange = (event) => {
-        const value = event.target.value;
-        setRecoveryAmount(value === '' ? 0 : Number(value));
-
-    };
-
-
-    function distributeLayers(transactionType) {
-        if (transactionType === 'Payment') {
-            let balances = calculateLayers(parseFloat(transactionAmount));
-            console.log(balances)
-            setBalances({
-                excess: balances[0].balance,
-                sir: balances[1].balance,
-                ins: balances[2].balance,
-                agg: balances[3].balance
-            });
-        } else if (transactionType === 'Recovery') {
-            let balances = distributeRecoveries(parseFloat(recoveryAmount));
-            console.log(balances)
-            setBalances({
-                excess: balances[0].balance,
-                sir: balances[1].balance,
-                ins: balances[2].balance,
-                agg: balances[3].balance
-
-            });
-        }
-
-    }
     return (
         <>
             <div className="card">
                 <HelpPopover />
                 <h4>funding layers</h4>
-
-
                 <div>
-                    <Layer layerName="Excess" balance={balances.excess}/>
-                    <Layer layerName="SIR" balance={balances.sir}/>
-                    <Layer layerName="Insurer" balance={balances.ins}/>
+                    {LAYERS.map(({ key, label }) => (
+                        <Layer
+                            key={key}
+                            layerName={key}
+                            label={label}
+                            balance={balances[key]}
+                            limit={limits[key]}
+                            isRanking={isRanking[key]}
+                            onLimitChange={value =>
+                                setLimits(prev => ({ ...prev, [key]: value }))
+                            }
+                            onRankingChange={value =>
+                                setIsRanking(prev => ({ ...prev, [key]: value }))
+                            }
+                        />
+                    ))}
                 </div>
-                <h4>aggregate balance</h4>
                 <div>
-                    <Aggregate layerName="Aggregate" balance={balances.agg}/>
+                    <AddAmount type={"Payment"} onAddAmount={handleAddAmount}/>
                 </div>
-                <br/>
-                <Box sx={{display: 'flex', alignItems: 'center'}}>
-                    <Box className="add-buttons">
-                <FormLabel>
-                    {'Add Payment'}
-                </FormLabel>
-                <OutlinedInput
-                    id="paymentTransaction"
-                    placeholder="0.00"
-                    size="small"
-                    value={transactionAmount}
-                    onChange={transactionAmountChange}
-                    color={"secondary"}
-                />
-                <Button variant="contained"
-                        id="Payment"
-                        onClick={() => {
-                            distributeLayers('Payment');
-                        }}
-                >Add
-                </Button>
-                </Box>
-                    <Box className="add-buttons">
-                <FormLabel>
-                    {'Add Recovery'}
-                </FormLabel>
-                <OutlinedInput
-                    id="recoveryTransaction"
-                    placeholder="0.00"
-                    size="small"
-                    value={recoveryAmount}
-                    onChange={recoveryAmountChange}
-                    color={"secondary"}
-                />
-                <Button variant="contained"
-                        id="Recovery"
-                        onClick={() => {
-                            distributeLayers('Recovery');
-                        }}
-                >Add
-                </Button>
-                    </Box>
-                </Box>
+
             </div>
-
         </>
     )
 }

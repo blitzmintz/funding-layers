@@ -1,7 +1,7 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0.5rem 2rem 2rem;
   text-align: center;
   color: #213547;
 }
@@ -14,16 +14,25 @@
   min-width: max-content;
 }
 
+
 .mobile-layer-name {
   text-align: right;
   min-width: 120px;
 }
 
-.layer-box {
+.aggregate-layer-box {
   display: flex;
   gap: 40px;
   align-items: center;
   margin-right: 160px;
+}
+
+
+.layer-box {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  margin-right: 0px;
 }
 
 .add-buttons {

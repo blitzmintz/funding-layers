@@ -1,40 +1,46 @@
 import './css/App.css'
-import {Box, FormLabel, TextField} from '@mui/material';
-import {useState} from "react";
+import {Box, Checkbox, FormControlLabel, FormLabel, TextField} from '@mui/material';
 
-
-export default function Layer({ layerName, balance }) {
-    const [inputValue, setInputValue] = useState('');
-    const handleChange = (event) => {
-        setInputValue(event.target.value);
-    };
+export default function Layer({ layerKey,
+                                  label,
+                                  balance,
+                                  limit,
+                                  isRanking,
+                                  onLimitChange,
+                                  onRankingChange }) {
 
     function hasLimit(layerName) {
-        return layerName === "Excess" || layerName === "SIR";
+        return layerName === "Excess" || layerName === "SIR" || layerName === "Aggregate";
     }
-
-    const fieldId = layerName.toString().length;
 
     return (
         <Box sx={{mb: 2}} className="layer-box">
-            <FormLabel sx={{ color: 'text.primary'}} className="mobile-layer-name">
-                {layerName}
-            </FormLabel>
+                <FormLabel sx={{ color: 'text.primary'}} className="mobile-layer-name">
+                    {label}
+                </FormLabel>
             <TextField
-                id={layerName}
+                id={layerKey}
                 type="number"
-                label={hasLimit(layerName) ? "Enter limit" : "Limit not applicable"}
-                value={inputValue}
-                onChange={handleChange}
-                disabled={!hasLimit(layerName)}
+                label={hasLimit(label) ? "Enter limit" : "Limit not applicable"}
+                value={limit ?? ''}
+                onChange={e => onLimitChange(Number(e.target.value) || null)}
+                disabled={(!hasLimit(label))}
                 color={"secondary"}
             />
             <TextField disabled
-            value={balance ?? 0}
-            label="Balance"
-            id={fieldId.toString()}
-
+                       value={balance ?? 0}
+                       label="Balance"
             />
+            {hasLimit(label) && label !== "Aggregate" && (
+                <FormControlLabel labelPlacement={"end"}
+                control={<Checkbox
+                        onChange={e => onRankingChange(e.target.checked)}
+                        checked={isRanking}></Checkbox>}
+                label={"Ranking"}>
+                </FormControlLabel>
+                )
+            }
+
         </Box>
 
     )
